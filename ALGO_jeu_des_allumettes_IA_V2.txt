@@ -1,0 +1,317 @@
+//ALGORITHME : jeu_des_allumettes_2J_V1 (input,output)
+//BUT:-Le jeu se joue seul
+//-Le joueur et l IA se partagent un tas de 16 allumettes. 
+//-À tour de rôle, ils doivent retirer 1, 2 ou 3 allumettes du tas ; 
+//-le joueur qui retire la dernière allumette a perdu.
+//-Vous ne pouvez retirer des allumettes que dans une seule ligne à chaque tour sur la pyramide.
+//ENTREE: nombres d'allumettes choisies par l IA et le joueur, de même pour les lignes
+//SORTIE: numéro du joueur qui doit jouer, nombre d'allumettes dans la main des joueurs, nombre d'allumettes sur le tas, tableau des scores
+
+const
+        NbAlluMax=16 //Nombre maximum d'allumettes
+
+type
+        Allumettes=ENREGISTREMENT //Enregistrement pour le tas d'allumettes
+                NbTas:ENTIER //Nombre d'allumettes sur le tas
+                Ligne:ENTIER //Numero de la ligne d'allumettes
+                NbLigne:ENTIER //Nombre d'allumettes sur la ligne
+        FinEnregistrement
+
+type
+        CaracJoueur=ENREGISTREMENT  //Caracteristiques du joueur
+                NumeroJoueur:ENTIER //Numero du joueur
+                Choix:ENTIER //Nombre d'allumettes prises par le joueur
+                AlluMain:ENTIER //Nombre d'allumettes dans la main du joueur
+                ChoixLigne:ENTIER //Le choix de la ligne a laquelle on retire des allumettes
+        FinEnregistrement
+
+type
+        Scores=ENREGISTREMENT //Tableau des scores
+                Gagnant:ENTIER //Gagnant du jeu
+                NbTours:ENTIER //Nombre de tours passes pour terminer la partie
+        FinEnregistrement
+
+type
+        TableauLignes=ENREGISTREMENT //Tableau de lignes
+                Tab1D:Array [1..4] of Allumettes //Tableau 1 dim d'allumettes
+        FinEnregistrement
+
+//Creation des lignes
+procedure CreatLignes (var L1,L2,L3,L4:Allumettes)
+        DEBUT
+        //Ligne1
+        L1.NbLigne<-1
+        L1.Ligne<-1
+
+        //Ligne2
+        L2.NbLigne<-3
+        L2.Ligne<-2
+
+        //Ligne3
+        L3.NbLigne<-5
+        L3.Ligne<-3
+
+        //Ligne4
+        L4.NbLigne<-7
+        L4.Ligne<-4
+        FinProcedure
+
+//Creation tableau de lignes
+procedure SetTabLignes (var TabLignes:TableauLignes;var L1,L2,L3,L4:Allumettes)
+        DEBUT
+        TabLignes.Tab1D[1]<-L1
+        TabLignes.Tab1D[2]<-L2
+        TabLignes.Tab1D[3]<-L3
+        TabLignes.Tab1D[4]<-L4
+        FinProcedure
+
+//Affichage de la pyramide
+procedure Pyramide (var L1,L2,L3,L4:Allumettes var TabLignes:TableauLignes)
+        var
+                i:ENTIER
+
+        DEBUT
+
+        //Ligne1
+        SI (TabLignes.Tab1D[1].NbLigne>0) ALORS
+                
+                POUR i<-1 TO TabLignes.Tab1D[1].NbLigne FAIRE
+                        
+                        GoToXY(39+i,1)
+                        ECRIRE("X")
+                        
+                FINPOUR
+        FINSI
+
+        //Ligne2
+        SI (TabLignes.Tab1D[2].NbLigne>0) ALORS
+                
+                POUR i<-1 TO TabLignes.Tab1D[2].NbLigne FAIRE
+                        
+                        GoToXY(39+i,2)
+                        ECRIRE("X")
+                FINPOUR
+        FINSI
+                        
+                
+
+        //Ligne3
+        SI (TabLignes.Tab1D[3].NbLigne>0) ALORS
+                
+                POUR i<-1 TO TabLignes.Tab1D[3].NbLigne FAIRE
+                        
+                        GoToXY(39+i,3)
+                        ECRIRE("X")
+                FINPOUR
+        FINSI
+                
+
+        //Ligne4
+        SI (TabLignes.Tab1D[4].NbLigne>0) ALORS
+                
+                POUR i<-1 TO TabLignes.Tab1D[4].NbLigne FAIRE
+                        
+                        GoToXY(39+i,4)
+                        ECRIRE("X")
+                FINPOUR
+        FINSI
+
+        FinProcedure
+
+//Creation des deux joueurs et initialisation de leur numero et de leur main
+procedure SetJoueurs (var Joueur1, Joueur2:CaracJoueur)
+        DEBUT
+        //Joueur 1
+                Joueur1.NumeroJoueur<-1
+                Joueur1.AlluMain<-0
+
+        //Joueur 2
+                Joueur2.NumeroJoueur<-2
+                Joueur2.AlluMain<-0
+        FinProcedure
+
+//Tour de jeu
+procedure TourDeJeu (var Joueur1, Joueur2:CaracJoueur; Tour:ENTIER;var Scoreboard:Scores;var L1,L2,L3,L4:Allumettes;var TabLignes:TableauLignes)
+        var
+                Tas:Allumettes //Tas d'allumettes
+                i:ENTIER
+
+        DEBUT
+
+        //Initialisation du nombre d allumettes du tas d allumettes
+        Tas.NbTas<-NbAlluMax
+
+        //Initialisation du tour
+        Tour<-1
+
+        //Boucle de jeu
+        REPETER
+
+                //Pour le 1er joueur
+                SI (Tour MOD 2<>0) ALORS
+                        
+                        //Affichage de la main des joueurs
+                        ECRIRE("Le joueur 1 a ",Joueur1.AlluMain," allumettes")
+                        ECRIRE("Le joueur 2 a ",Joueur2.AlluMain," allumettes")
+
+                        //Affichage du nombre d'allumettes sur le tas
+                        ECRIRE("Il y a ",Tas.NbTas," allumettes sur le tas")
+
+                        Pyramide(L1,L2,L3,L4,TabLignes)
+
+                        //Entree du choix de la ligne
+                        ECRIRE("Choisissez la ligne")
+
+                        REPETER
+                                REPETER
+                                        LIRE(Joueur1.ChoixLigne)
+                                JUSQU A (Joueur1.ChoixLigne>=1) ET (Joueur1.ChoixLigne<=4)
+                                i<-Joueur1.ChoixLigne
+                        JUSQU A (TabLignes.Tab1D[i].NbLigne<>0)
+
+                        //Entree du choix du nombre
+                        ECRIRE("Retirez 1, 2 ou 3 allumettes : ")
+                        SI (TabLignes.Tab1D[i].NbLigne>=3) ALORS
+                                
+                                REPETER
+                                        LIRE(Joueur1.Choix)
+                                JUSQU A (Joueur1.Choix=1) OR (Joueur1.Choix=2) OR (Joueur1.Choix=3)
+                                
+                        SINON
+                                
+                                SI (TabLignes.Tab1D[i].NbLigne=2) ALORS
+                                        
+                                        REPETER
+                                                LIRE(Joueur1.Choix)
+                                        JUSQU A (Joueur1.Choix=1) OR (Joueur1.Choix=2)
+                                        
+                                SINON
+                                        
+                                        REPETER
+                                                LIRE(Joueur1.Choix)
+                                        JUSQU A (Joueur1.Choix=1)
+                                FINSI
+                        FINSI
+                                        
+                                
+
+                        //Decrementation du tas
+                        Tas.NbTas<-Tas.NbTas-Joueur1.Choix
+                        TabLignes.Tab1D[i].NbLigne<-TabLignes.Tab1D[i].NbLigne-Joueur1.Choix
+
+                        //Incrementation de la main du joueur
+                        Joueur1.AlluMain<-Joueur1.AlluMain+Joueur1.Choix
+
+                        //Enregistre le numero du joueur gagnant
+                        SI (Tas.NbTas=0) ALORS
+                                
+                                Scoreboard.Gagnant<-Joueur2.NumeroJoueur
+                        FINSI
+                FINSI
+                                
+                        
+
+                //Pour l IA
+                SI (Tour MOD 2=0) ALORS
+                        
+                        //IA Lignes
+                        REPETER
+                                REPETER
+                                        Randomize
+                                        Joueur2.ChoixLigne<-Random(4)+1
+                                JUSQU A (Joueur2.ChoixLigne>=1) ET (Joueur2.ChoixLigne<=4)
+                                i<-Joueur2.ChoixLigne
+                        JUSQU A (TabLignes.Tab1D[i].NbLigne<>0)
+
+                        //IA Nombre allumettes
+                        SI (TabLignes.Tab1D[i].NbLigne=2) OR (TabLignes.Tab1D[i].NbLigne=1) ALORS //S'il reste 2 allumettes ou 1
+                                
+                                Joueur2.Choix<-1//L IA enleve 1 allumette
+                                
+                        SINON
+                                
+                                SI (TabLignes.Tab1D[i].NbLigne=3) ALORS //Si il reste 3 allumettes
+                                        
+                                        Joueur2.Choix<-2 //L IA enleve 2 allumettes
+                                        
+                                SINON
+                                        
+                                        //Sinon l IA enleve autant d'allumettes que necessaire pour qu il reste un nombre d allumettes multiple de 5
+                                        Joueur2.Choix<-1
+                                        TANTQUE (Joueur2.Choix<3) ET ((Tas.NbTas-Joueur2.Choix) MOD 5<>0) FAIRE
+                                                
+                                                Joueur2.Choix<-Joueur2.Choix+1
+                                        FINTANTQUE
+                                FINSI
+                        FINSI
+                                                
+                                        
+                                
+
+                        //Decrementation du tas
+                        Tas.NbTas<-Tas.NbTas-Joueur2.Choix
+                        TabLignes.Tab1D[i].NbLigne<-TabLignes.Tab1D[i].NbLigne-Joueur2.Choix
+
+                        //Incrementation de la main du joueur
+                        Joueur2.AlluMain<-Joueur2.AlluMain+Joueur2.Choix
+
+                        //Enregistre le numero du joueur gagnant
+                        SI (Tas.NbTas=0) ALORS
+                                
+                                Scoreboard.Gagnant<-Joueur1.NumeroJoueur
+                        FINSI
+                FINSI
+                                
+                        
+
+                //Incrementation du tour
+                Tour<-Tour+1
+
+        JUSQU A (Tas.NbTas=0)
+
+        //Enregistre le nombre de tours de la partie
+        Scoreboard.NbTours<-Tour
+
+        FinProcedure
+
+//Tableau des scores
+procedure TabScores (var Scoreboard:scores)
+        DEBUT
+        ECRIRE(".____________________________.")
+        ECRIRE("|      FIN DE LA PARTIE      |")
+        ECRIRE("|____________________________|")
+        ECRIRE("| Le gagnant est le joueur ", Scoreboard.Gagnant," |")
+        ECRIRE("|____________________________|")
+        ECRIRE("| Nombre de tours joues : ", Scoreboard.NbTours,"  |")
+        ECRIRE("|____________________________|")
+        FinProcedure
+
+var
+        Joueur1, Joueur2:CaracJoueur //Variables contenant ce qui caracterise les 2 joueurs
+        TasAll:Allumettes //Variable contenant ce qui caract‚rise le tas d'allumettes
+        Tour:ENTIER //Tour de jeu
+        Scoreboard:Scores //Tableau des scores
+        L1,L2,L3,L4:Allumettes //Lignes de la pyramide
+        TabLignes:TableauLignes //Tableau de lignes
+
+//Programme principal
+DEBUT
+        ECRIRE("Programme : jeu des allumettes")
+        ECRIRE("Appuyez sur 'entrer' pour continuer")
+
+        //Creation des lignes
+        CreatLignes(L1,L2,L3,L4)
+
+        //Creation du tableau des lignes
+        SetTabLignes(TabLignes,L1,L2,L3,L4)
+
+        //Initialisation des joueurs
+        SetJoueurs(Joueur1,Joueur2)
+
+        //Tour de jeu
+        TourDeJeu(Joueur1,Joueur2,Tour,Scoreboard,L1,L2,L3,L4,TabLignes)
+
+        //Tableau des scores
+        TabScores(Scoreboard)
+FIN.
+

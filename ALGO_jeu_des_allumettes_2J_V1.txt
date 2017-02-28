@@ -1,0 +1,185 @@
+﻿//ALGORITHME : jeu_des_allumettes_2J_V1 (input,output)
+//BUT:-Le jeu se joue à deux.
+//-Les deux joueurs se partagent un tas de 21 allumettes. 
+//-À tour de rôle, ils doivent retirer 1, 2 ou 3 allumettes du tas ; 
+//-le joueur qui retire la dernière allumette a perdu.
+//ENTREE: nombres d'allumettes choisies par les deux joueurs
+//SORTIE: numéro du joueur qui doit jouer, nombre d'allumettes dans la main des joueurs, nombre d'allumettes sur le tas, tableau des scores
+
+const
+        NbAlluMax=21 //Nombre maximum d'allumettes
+
+type
+        CaracJoueur=ENREGISTREMENT  //Caracteristiques du joueur
+                NumeroJoueur:ENTIER //Numero du joueur
+                Choix:ENTIER //Nombre d'allumettes prises par le joueur
+                AlluMain:ENTIER //Nombre d'allumettes dans la main du joueur
+        FinEnregistrement
+
+type
+        Allumettes=ENREGISTREMENT //Enregistrement pour le tas d'allumettes
+                NbTas:ENTIER //Nombre d'allumettes sur le tas
+        FinEnregistrement
+
+type
+        Scores=ENREGISTREMENT//Tableau des scores
+                Gagnant:ENTIER //Gagnant du jeu
+                NbTours:ENTIER //Nombre de tours passes pour terminer la partie
+        FinEnregistrement
+
+//Creation des deux joueurs et initialisation de leur numero et de leur main
+procedure SetJoueurs (var Joueur1, Joueur2:CaracJoueur)
+        DEBUT
+        //Joueur 1
+                Joueur1.NumeroJoueur<-1
+                Joueur1.AlluMain<-0
+
+        //Joueur 2
+                Joueur2.NumeroJoueur<-2
+                Joueur2.AlluMain<-0
+        FinProcedure
+
+procedure TourDeJeu (var Joueur1, Joueur2:CaracJoueur; Tour:ENTIER;var Scoreboard:Scores)
+        var
+                Tas:Allumettes
+
+        DEBUT
+
+        //Initialisation du nombre d allumettes du tas d allumettes
+        Tas.NbTas<-NbAlluMax
+
+        //Initialisation du tour
+        Tour<-1
+
+        //Boucle de jeu
+        REPETER
+                //Pour le 1er joueur
+                SI (Tour MOD 2<>0) ALORS
+                        //Affichage du numero du joueur qui doit jouer
+                        ECRIRE("Tour du joueur : ",Joueur1.NumeroJoueur)
+
+                        //Affichage de la main des joueurs
+                        ECRIRE("Le joueur 1 a ",Joueur1.AlluMain," allumettes")
+                        ECRIRE("Le joueur 2 a ",Joueur2.AlluMain," allumettes")
+
+                        //Affichage du nombre d'allumettes sur le tas
+                        ECRIRE("Il y a ",Tas.NbTas,"" allumettes sur le tas")
+
+                        //Entree du choix du joueur
+                        ECRIRE("Retirez 1, 2 ou 3 allumettes : ")
+                        SI (Tas.NbTas>=3) ALORS
+                                REPETER
+                                        LIRE(Joueur1.Choix)
+                                JUSQU'A (Joueur1.Choix=1) OU (Joueur1.Choix=2) OU (Joueur1.Choix=3)
+                        SINON
+                                SI (Tas.NbTas=2) ALORS
+                                        REPETER
+                                                LIRE(Joueur1.Choix)
+                                        JUSQU'A (Joueur1.Choix=1) OU (Joueur1.Choix=2)
+                                SINON
+                                        REPETER
+                                                LIRE(Joueur1.Choix)
+                                        JUSQU'A (Joueur1.Choix=1)
+                                FINSI
+                        FINSI
+
+                        //Decrementation du tas
+                        Tas.NbTas<-Tas.NbTas-Joueur1.Choix
+
+                        //Incrementation de la main du joueur
+                        Joueur1.AlluMain<-Joueur1.AlluMain+Joueur1.Choix
+
+                        //Enregistre le numero du joueur gagnant
+                        SI (Tas.NbTas=0) ALORS
+                                Scoreboard.Gagnant<-Joueur2.NumeroJoueur
+                        FINSI
+                FINSI
+
+                //Pour le 2eme joueur
+                SI (Tour MOD 2=0) ALORS
+                        begin
+                        //Affichage du numero du joueur qui doit jouer
+                        ECRIRE("Tour du joueur : ",Joueur2.NumeroJoueur)
+                        ECRIRE
+
+                        //Affichage de la main des joueurs
+                        ECRIRE("Le joueur 1 a ",Joueur1.AlluMain," allumettes")
+                        ECRIRE("Le joueur 2 a ",Joueur2.AlluMain," allumettes")
+                        ECRIRE
+
+                        //Affichage du nombre d'allumettes sur le tas
+                        ECRIRE("Il y a ",Tas.NbTas," allumettes sur le tas")
+                        ECRIRE
+
+                        //Entree du choix du joueur
+                        ECRIRE("Retirez 1, 2 ou 3 allumettes : ")
+                        SI (Tas.NbTas>=3) ALORS
+                                REPETER
+                                        LIRE(Joueur2.Choix);
+                                JUSQU'A (Joueur2.Choix=1) OU (Joueur2.Choix=2) OU (Joueur2.Choix=3)
+                        SINON
+                                SI (Tas.NbTas=2) ALORS
+                                        REPETER
+                                                LIRE(Joueur2.Choix)
+                                        JUSQU'A (Joueur2.Choix=1) OR (Joueur2.Choix=2)
+                                SINON
+                                        REPETER
+                                                LIRE(Joueur2.Choix);
+                                        JUSQU'A (Joueur2.Choix=1);
+                                FINSI
+                        FINSI
+
+                        //Decrementation du tas
+                        Tas.NbTas<-Tas.NbTas-Joueur2.Choix
+
+                        //Incrementation de la main du joueur
+                        Joueur2.AlluMain<-Joueur2.AlluMain+Joueur2.Choix
+
+                        //Enregistre le numero du joueur gagnant
+                        SI (Tas.NbTas=0) ALORS
+                                Scoreboard.Gagnant<-Joueur1.NumeroJoueur
+                        FINSI
+                FINSI
+
+                //Incrementation du tour
+                Tour<-Tour+1
+
+        JUSQU'A (Tas.NbTas=0)
+
+        //Enregistre le nombre de tours de la partie
+        Scoreboard.NbTours<-Tour
+
+        FinProcedure
+
+procedure TabScores (var Scoreboard:scores);
+        DEBUT
+        ECRIRE(".____________________________.")
+        ECRIRE("|      FIN DE LA PARTIE      |")
+        ECRIRE("|____________________________|")
+        ECRIRE("| Le gagnant est le joueur ", Scoreboard.Gagnant,' |")
+        ECRIRE("|____________________________|")
+        ECRIRE("| Nombre de tours joues : ", Scoreboard.NbTours,'  |")
+        ECRIRE("|____________________________|"")
+        FinProcedure
+
+var
+        Joueur1, Joueur2:CaracJoueur //Variables contenant ce qui caracterise les 2 joueurs
+        TasAll:Allumettes //Variable contenant ce qui caract‚rise le tas d'allumettes
+        Tour:entier //Tour de jeu
+        Scoreboard:Scores //Tableau des scores
+
+//Programme principal
+DEBUT
+        ECRIRE("Programme : jeu des allumettes")
+        ECRIRE("Appuyez sur 'entrer' pour continuer")
+
+        //Initialisation des joueurs
+        SetJoueurs(Joueur1,Joueur2)
+
+
+        //Tour de jeu
+        TourDeJeu(Joueur1,Joueur2,Tour,Scoreboard)
+
+        //Tableau des scores
+        TabScores(Scoreboard)
+FIN
